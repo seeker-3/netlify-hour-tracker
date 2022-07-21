@@ -1,4 +1,4 @@
-import { derived, get, writable } from 'svelte/store'
+import { derived, writable } from 'svelte/store'
 import { MILLISECONDS_PER_HOUR } from '../utils/time'
 
 const UPDATE_INTERVAL = 500
@@ -82,19 +82,19 @@ export const deleteClock = (name: string) => {
     })
 }
 
-export const modHoursClockTime = (name: string, hours) => {
+export const modHoursClockTime = (name: string, hours: number) => {
   updateClock(name, clock => {
     clock.time %= MILLISECONDS_PER_HOUR * hours
   })
 }
 
-export const setClockTime = (name: string, milliseconds) => {
+export const setClockTime = (name: string, milliseconds: number) => {
   updateClock(name, clock => {
     clock.time = milliseconds
   })
 }
 
-export const modifyClockTime = (name: string, milliseconds) => {
+export const modifyClockTime = (name: string, milliseconds: number) => {
   updateClock(name, clock => {
     clock.time += milliseconds
   })
@@ -102,6 +102,9 @@ export const modifyClockTime = (name: string, milliseconds) => {
 
 export const updateTimer = (name: string) =>
   updateClock(name, clock => {
+    if (typeof clock.previousTime !== 'number')
+      throw new Error('Clock has no previous time')
+
     const nextTime = Date.now()
     const deltaTime = nextTime - clock.previousTime
     clock.time += deltaTime
@@ -120,7 +123,10 @@ export const clearTimer = (name: string) =>
   updateClock(name, clock => {
     const nextTime = Date.now()
 
-    clearInterval(clock.interval)
+    if (typeof clock.interval === 'number') clearInterval(clock.interval)
+    if (typeof clock.previousTime !== 'number')
+      throw new Error('Clock has no previous time')
+
     clock.interval = null
     clock.isRunning = false
 

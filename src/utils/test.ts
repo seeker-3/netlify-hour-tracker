@@ -15,5 +15,5 @@ export const runTest = () => {
 }
 
 export const stopTest = () => {
-  clearInterval(interval)
+  if (interval !== null) clearInterval(interval)
 }

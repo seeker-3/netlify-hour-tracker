@@ -20,7 +20,7 @@
 
   const MIN_INPUT = 0
 
-  $: inputValue = time as number | null
+  $: inputValue = !isRunning ? time : null
   $: inputDisabled = isRunning || inputValue === null || inputValue < MIN_INPUT
 </script>
 
@@ -64,7 +64,7 @@
         }}>Add</GrayButton
       >
       <GrayButton
-        disabled={isRunning || inputValue < 0 || inputValue === null}
+        disabled={isRunning || inputValue === null || inputValue < 0}
         on:click={() => {
           if (inputValue !== null) setClockTime(name, inputValue)
         }}>Set</GrayButton

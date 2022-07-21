@@ -8,7 +8,11 @@ export const getStoredClockValues = () => {
 
   return Object.fromEntries(
     clockNames.map(clockName => {
-      const value = parseInt(localStorage.getItem(clockName))
+      const storage = localStorage.getItem(clockName)
+
+      if (storage === null) throw new Error(`No clock found for ${clockName}`)
+
+      const value = parseInt(storage)
 
       if (isNaN(value))
         throw Error(`Failed to parse clock value for clock name: ${clockName}`)
