@@ -18,25 +18,10 @@
   export let time: number
   export let isRunning: boolean
 
-  const buttons = [
-    {
-      onclick: modHoursClockTime,
-      innerText: 'Mod',
-      min: 1,
-    },
-    {
-      onclick: modifyClockTime,
-      innerText: 'Add',
-      min: 1,
-    },
-    {
-      onclick: setClockTime,
-      innerText: 'Set',
-      min: 0,
-    },
-  ]
+  const MIN_INPUT = 0
 
-  let inputValue: number | null = 1
+  $: inputValue = time as number | null
+  $: inputDisabled = isRunning || inputValue === null || inputValue < MIN_INPUT
 </script>
 
 <div class="grid justify-items-start gap-2" transition:mountTransition>
@@ -47,9 +32,13 @@
   <div class="grid auto-rows-fr gap-1">
     <div class="grid grid-flow-col items-stretch gap-1">
       <button
-        class="rounded-sm px-4 py-1 text-sm transition duration-300 hover:text-neutral-50 active:scale-[.98] active:outline-neutral-300 {!isRunning
-          ? 'bg-green-600 hover:bg-green-700'
-          : 'bg-red-600 hover:bg-red-700'}"
+        class="
+          rounded-sm px-4 py-1 text-sm font-medium transition duration-300
+          hover:text-neutral-50
+          active:scale-[.98] active:outline-neutral-300 active:transition-none
+          {!isRunning
+          ? 'bg-green-600 hover:bg-green-500'
+          : 'bg-red-700 hover:bg-red-600'}"
         on:click={() => toggleTimer(name, isRunning)}
         >{!isRunning ? 'Start' : 'Stop'}</button
       >
@@ -57,16 +46,29 @@
       <GrayButton on:click={() => deleteClock(name)}>Delete</GrayButton>
     </div>
 
-    <NumberInput min="0" disabled={isRunning} bind:value={inputValue} />
+    <NumberInput
+      min={MIN_INPUT.toString()}
+      disabled={isRunning}
+      bind:value={inputValue}
+    />
 
     <div class="grid grid-flow-col items-stretch gap-1">
-      {#each buttons as { onclick, innerText, min }}
-        <GrayButton
-          disabled={isRunning || inputValue < min || inputValue === null}
-          on:click={() => inputValue !== null && onclick(name, inputValue)}
-          >{innerText}</GrayButton
-        >
-      {/each}
+      <GrayButton
+        disabled={isRunning}
+        on:click={() => modHoursClockTime(name, 1)}>Mod</GrayButton
+      >
+      <GrayButton
+        disabled={inputDisabled}
+        on:click={() => {
+          if (inputValue !== null) modifyClockTime(name, inputValue)
+        }}>Add</GrayButton
+      >
+      <GrayButton
+        disabled={isRunning || inputValue < 0 || inputValue === null}
+        on:click={() => {
+          if (inputValue !== null) setClockTime(name, inputValue)
+        }}>Set</GrayButton
+      >
     </div>
   </div>
 </div>
